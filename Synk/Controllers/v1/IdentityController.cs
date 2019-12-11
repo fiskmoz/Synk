@@ -2,6 +2,7 @@
 using Synk.Contracts;
 using Synk.Contracts.v1.Requests;
 using Synk.Contracts.v1.Responses;
+using Synk.Domain;
 using Synk.Services;
 using System;
 using System.Collections.Generic;
@@ -29,23 +30,24 @@ namespace Synk.Controllers.v1
                 });
             }
             var authResponse = await _identityService.RegisterAsync(request.Email, request.Password);
-            if(!authResponse.Success)
-            {
-                return BadRequest(new AuthFailedResponse
-                {
-                    Errors = authResponse.ErrorMessages
-                });
-            };
-            return Ok(new AuthSuccessResponse
-            {
-                Token = authResponse.Token
-            });
+            return ValidateAuthResponse(authResponse);
         }
 
         [HttpPost(ApiRoutes.Identity.Login)]
         public async Task<IActionResult> Login([FromBody] UserLoginRequest request)
         {
             var authResponse = await _identityService.LoginAsync(request.Email, request.Password);
+            return ValidateAuthResponse(authResponse);
+        }
+        [HttpPost(ApiRoutes.Identity.Refresh)]
+        public async Task<IActionResult> Login([FromBody] RefreshTokenRequest request)
+        {
+            var authResponse = await _identityService.RefreshTokenAsync(request.Token, request.RefreshToken);
+            return ValidateAuthResponse(authResponse);
+        }
+
+        private IActionResult ValidateAuthResponse(AuthenticationResult authResponse)
+        {
             if (!authResponse.Success)
             {
                 return BadRequest(new AuthFailedResponse
@@ -55,7 +57,8 @@ namespace Synk.Controllers.v1
             };
             return Ok(new AuthSuccessResponse
             {
-                Token = authResponse.Token
+                Token = authResponse.Token,
+                RefreshToken = authResponse.RefreshToken
             });
         }
     }

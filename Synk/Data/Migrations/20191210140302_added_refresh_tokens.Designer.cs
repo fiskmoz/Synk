@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Synk.Data;
 
 namespace Synk.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20191210140302_added_refresh_tokens")]
+    partial class added_refresh_tokens
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -193,13 +195,13 @@ namespace Synk.Data.Migrations
 
                     b.Property<DateTime>("ExpiryDate");
 
-                    b.Property<bool>("Invalidated");
-
                     b.Property<string>("JwtId");
 
                     b.Property<bool>("Used");
 
                     b.Property<string>("UserId");
+
+                    b.Property<bool>("invalidated");
 
                     b.HasKey("Token");
 
