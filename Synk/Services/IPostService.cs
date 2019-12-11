@@ -16,5 +16,6 @@ namespace Synk.Services
         Task<bool> UpdatePostAsync(Post postToUpdate);
 
         Task<bool> DeletePostAsync(Guid postId);
+        Task<bool> UserOwnsPostAsync(Guid postid, string v);
     }
 }

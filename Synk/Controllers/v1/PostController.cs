@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Synk.Contracts;
 using Synk.Contracts.v1.Requests;
 using Synk.Contracts.v1.Responses;
+using Synk.Extensions;
 using Synk.Models;
 using Synk.Services;
 
@@ -32,11 +33,13 @@ namespace Synk.Controllers
         [HttpPut(ApiRoutes.Posts.Update)]
         public async Task<IActionResult> Update([FromRoute]Guid postId, [FromBody] UpdatePostRequest request)
         {
-            var post = new Post
+            var userOwnsPost = await _postService.UserOwnsPostAsync(postId, HttpContext.GetUserId());
+            if (!userOwnsPost)
             {
-                Id = postId,
-                Body = request.Body
-            };
+                return BadRequest(new { error = "You do not own this post" });
+            }
+            var post = await _postService.GetPostByIdAsync(postId);
+            post.Body = request.Body;
 
             var updated = await _postService.UpdatePostAsync(post);
             if (updated)
@@ -47,6 +50,11 @@ namespace Synk.Controllers
         [HttpDelete(ApiRoutes.Posts.Delete)]
         public async Task<IActionResult> Update([FromRoute]Guid postId)
         {
+            var userOwnsPost = await _postService.UserOwnsPostAsync(postId, HttpContext.GetUserId());
+            if (!userOwnsPost)
+            {
+                return BadRequest(new { error = "You do not own this post" });
+            }
             var deleted = await _postService.DeletePostAsync(postId);
             if (deleted)
                 return NoContent();
@@ -65,7 +73,11 @@ namespace Synk.Controllers
         [HttpPost(ApiRoutes.Posts.Create)]
         public async Task<IActionResult> Create([FromBody] CreatePostRequest postRequest)
         {
-            var post = new Post { Body = postRequest.Body };
+            var post = new Post
+            {
+                Body = postRequest.Body,
+                UserId = HttpContext.GetUserId()
+            };
 
             await _postService.CreatePostAsync(post);
 

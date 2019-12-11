@@ -11,5 +11,6 @@ namespace Synk.Domain
         public bool Success { get; set; }
         public string ErrorMessage { get; set; }
         public IEnumerable<string> ErrorMessages { get; set; }
+        public string RefreshToken { get; internal set; }
     }
 }

@@ -13,6 +13,7 @@ using Synk.Data;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Synk.Installers;
+using Microsoft.IdentityModel.Logging;
 
 namespace Synk
 {
@@ -37,6 +38,7 @@ namespace Synk
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                IdentityModelEventSource.ShowPII = true;
             }
             else
             {

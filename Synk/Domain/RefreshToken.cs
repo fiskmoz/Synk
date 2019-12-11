@@ -6,16 +6,17 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Synk.Models
+namespace Synk.Domain
 {
-    public class Post
+    public class RefreshToken
     {
         [Key]
-        public Guid Id { get; set; }
-        public DateTime PublishDate { get; set; }
-        public string Body { get; set; }
-        public string Author { get; set; }
-        public string Likes { get; set; }
+        public string Token { get; set; }
+        public string JwtId { get; set; }
+        public DateTime CreationDate { get; set; }
+        public DateTime ExpiryDate { get; set; }
+        public bool Used { get; set; }
+        public bool Invalidated { get; set; }
         public string UserId { get; set; }
         [ForeignKey(nameof(UserId))]
         public IdentityUser User { get; set; }

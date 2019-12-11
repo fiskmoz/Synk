@@ -1,10 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net461</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
     <DebugType>full</DebugType>
     <UserSecretsId>aspnet-Synk-C2728665-FD79-453A-96BA-73121697F58B</UserSecretsId>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Dockerfile" />
+  </ItemGroup>
 
 
   <ItemGroup>
