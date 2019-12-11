@@ -1,8 +1,14 @@
 # Synk
 
-Getting started: 
+Getting started without docker: 
+- sdasd
 - Install dependencies (nuget cmd)
 - Run Update-Database to make all migrations to the DB.
+
+With docker: 
+- run docker-compose build in root folder
+- run docker-compose up
+- navigate to localhost port 7000. DB port is 1400
 
 
 When deploying: 
@@ -10,7 +16,7 @@ When deploying:
 - docker-compose build
 - docker-compose up
 
-Running .NET core 2.2 in docker containers
+Running .NET core 2.2
 
 Includes: 
 - Swagger api testing and documentation
