@@ -7,6 +7,6 @@ namespace Synk.Contracts.v1.Responses
 {
     public class PostResponse
     {
-        public Guid SearchId { get; set; }
+        public Guid Id { get; set; }
     }
 }
