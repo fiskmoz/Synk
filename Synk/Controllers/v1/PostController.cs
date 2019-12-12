@@ -84,7 +84,7 @@ namespace Synk.Controllers
             var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.ToUriComponent()}";
             var locationUri = baseUrl + "/" + ApiRoutes.Posts.Get.Replace("{postId}", post.Id.ToString());
 
-            var response = new PostResponse { SearchId = post.Id };
+            var response = new PostResponse { Id = post.Id };
             return Created(locationUri, post);
         }
     }
