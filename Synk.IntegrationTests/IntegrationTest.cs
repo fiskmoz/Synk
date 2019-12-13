@@ -11,13 +11,13 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using System.Net.Http.Formatting;
 
 namespace Synk.IntegrationTests
 {
-    public class IntegrationTest
+    public class IntegrationTest : IDisposable
     {
         protected readonly HttpClient TestClient;
+        private readonly IServiceProvider _serviceProvider;
 
         protected IntegrationTest()
         {
@@ -29,8 +29,17 @@ namespace Synk.IntegrationTests
                         services.AddDbContext<ApplicationDbContext>(options => { options.UseInMemoryDatabase("TestDb"); });
                     });
                 });
+            _serviceProvider = appFactory.Server.Services;
             TestClient = appFactory.CreateClient();
         }
+
+        public void Dispose()
+        {
+            using var serviceScope = _serviceProvider.CreateScope();
+            var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>();
+            context.Database.EnsureDeleted();
+        }
+
         protected async Task AuthenticateAsync()
         {
             TestClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", await GetJwtAsync());
