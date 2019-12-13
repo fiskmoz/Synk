@@ -16,11 +16,11 @@ services:
    - localdev
 
  db-server:
-  image: mcr.microsoft.com/mssql/server:2019-latest
+  image: mcr.microsoft.com/mssql/server:2017-latest
   container_name: db-server
   environment:
    - ACCEPT_EULA=Y
-   - MSSQL_SA_PASSWORD=Christoffer1234
+   - MSSQL_SA_PASSWORD=Christoffer123!
    - MSSQL_TCP_PORT=1433
   ports:
    - "1400:1433"

@@ -16,11 +16,14 @@ namespace Synk.Installers
         public void InstallService(IServiceCollection services, Microsoft.Extensions.Configuration.IConfiguration configuration)
         {
             services.AddDbContext<ApplicationDbContext>(options =>
-             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+            options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
+
             services.AddDefaultIdentity<IdentityUser>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
 
             services.AddScoped<IPostService, PostService>();
+            services.AddScoped<IIdentityService, IdentityService>();
         }
     }
 }

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using Synk.Services;
+using Microsoft.OpenApi.Models;
 
 namespace Synk.Installers
 {
@@ -17,32 +18,36 @@ namespace Synk.Installers
     {
         public void InstallService(IServiceCollection services, IConfiguration configuration)
         {
-            services.AddScoped<IIdentityService, IdentityService>();
-
             var jwtSettings = new JwtSettings();
             configuration.Bind(nameof(jwtSettings), jwtSettings);
             services.AddSingleton(jwtSettings);
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
-
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info { Title = "My API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
                 var security = new Dictionary<string, IEnumerable<string>> 
                 {
                     {"Bearer", new string[0] }
                 };
 
-                c.AddSecurityDefinition("Bearer", new ApiKeyScheme
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Description = "JWT Authorization header using bearer scheme",
                     Name = "Authorization",
-                    In = "header",
-                    Type = "apiKey"
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey
                 });
 
-                c.AddSecurityRequirement(security);
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement 
+                {
+                    {new OpenApiSecurityScheme{Reference = new OpenApiReference
+                        {
+                            Id = "Bearer",
+                            Type = ReferenceType.SecurityScheme
+                        }}, new List<String>() 
+                    }
+                });
             });
 
             var tokenValidationParameters = new TokenValidationParameters
