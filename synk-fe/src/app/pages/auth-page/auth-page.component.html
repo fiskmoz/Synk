@@ -1,0 +1,38 @@
+<div class="container">
+  <div class="row">
+    <div class="col-md-4 mx-auto">
+      <div class="app-init-card">
+        <h1 class="text-center">
+          Welcome to Synk
+        </h1>
+        <p class="text-center">
+          Enjoy your stay!
+        </p>
+        <div *ngIf="loginMode">
+          <app-login></app-login>
+          <div *ngIf="!hasRegistered" class="text-center">
+            <p>
+              Need an account?
+            </p>
+            <button class="btn btn-primary" (click)="toggle()">
+              Register
+            </button>
+          </div>
+          <div *ngIf="hasRegistered" class="text-center">
+            <p>
+              Account registered!
+            </p>
+          </div>
+        </div>
+        <div *ngIf="!loginMode">
+          <app-registration
+            (onRegistration$)="onRegistration()"
+          ></app-registration>
+          <button class="btn-block btn-secondary" (click)="toggle()">
+            Back to login
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
