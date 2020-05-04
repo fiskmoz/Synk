@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Synk.Installers;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.Extensions.Hosting;
+using Synk.Models;
 
 namespace Synk
 {
@@ -30,6 +31,7 @@ namespace Synk
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<ApplicationSettingsDto>(Configuration.GetSection("ApplicationSettings"));
             services.InstallServicesInAssembly(Configuration);
             services.AddMvc(options =>
             {
@@ -60,7 +62,7 @@ namespace Synk
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
+            app.UseCors();
             app.UseAuthentication();
 
             app.UseMvc(routes =>

@@ -28,12 +28,12 @@ namespace Synk.Services
             _dataContext = dataContext;
         }
 
-        public async Task<AuthenticationResult> LoginAsync(string email, string password)
+        public async Task<AuthenticationResultDto> LoginAsync(string email, string password)
         {
             var user = await _userManager.FindByEmailAsync(email);
             if (user == null)
             {
-                return new AuthenticationResult
+                return new AuthenticationResultDto
                 {
                     ErrorMessages = new[] { "User does not exist" }
                 };
@@ -41,7 +41,7 @@ namespace Synk.Services
             var userHasValidPassword = await _userManager.CheckPasswordAsync(user, password);
             if (!userHasValidPassword)
             {
-                return new AuthenticationResult
+                return new AuthenticationResultDto
                 {
                     ErrorMessages = new[] { "User/password combination is wrong." }
                 };
@@ -49,12 +49,12 @@ namespace Synk.Services
             return await GenerateAuthenticationResultForUserAsync(user);
         }
 
-        public async Task<AuthenticationResult> RefreshTokenAsync(string token, string refreshToken)
+        public async Task<AuthenticationResultDto> RefreshTokenAsync(string token, string refreshToken)
         {
             var validatedToken = GetPrincipalFromToken(token);
             if (validatedToken == null)
             {
-                return new AuthenticationResult { ErrorMessages = new[] { "Invalid Token" } };
+                return new AuthenticationResultDto { ErrorMessages = new[] { "Invalid Token" } };
             }
             var expiryDateUnix = long.Parse(validatedToken.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Exp).Value);
             var expiryDateTimeUtc = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).
@@ -62,7 +62,7 @@ namespace Synk.Services
                 .Add(_jwtSettings.TokenLifeTime);
             if (expiryDateTimeUtc > DateTime.UtcNow)
             {
-                return new AuthenticationResult { ErrorMessages = new[] { "This token has not expired yet" } };
+                return new AuthenticationResultDto { ErrorMessages = new[] { "This token has not expired yet" } };
             }
 
             var jti = validatedToken.Claims.Single(x => x.Type == JwtRegisteredClaimNames.Jti).Value;
@@ -70,19 +70,19 @@ namespace Synk.Services
 
             if(storedRefreshToken == null)
             {
-                return new AuthenticationResult { ErrorMessages = new[] { "This tokes does not exist" } };
+                return new AuthenticationResultDto { ErrorMessages = new[] { "This tokes does not exist" } };
             }
             if(storedRefreshToken.Invalidated)
             {
-                return new AuthenticationResult { ErrorMessages = new[] { "This token is invalid" } };
+                return new AuthenticationResultDto { ErrorMessages = new[] { "This token is invalid" } };
             }
             if (storedRefreshToken.Used)
             {
-                return new AuthenticationResult { ErrorMessages = new[] { "This token has been used" } };
+                return new AuthenticationResultDto { ErrorMessages = new[] { "This token has been used" } };
             }
             if (storedRefreshToken.JwtId != jti)
             {
-                return new AuthenticationResult { ErrorMessages = new[] { "This token does not match" } };
+                return new AuthenticationResultDto { ErrorMessages = new[] { "This token does not match" } };
             }
 
             storedRefreshToken.Used = true;
@@ -118,12 +118,12 @@ namespace Synk.Services
                 StringComparison.InvariantCultureIgnoreCase);
         }
 
-        public async Task<AuthenticationResult> RegisterAsync(string email, string password)
+        public async Task<AuthenticationResultDto> RegisterAsync(string email, string password)
         {
             var existingUser = await _userManager.FindByEmailAsync(email);
             if (existingUser != null)
             {
-                return new AuthenticationResult
+                return new AuthenticationResultDto
                 {
                     ErrorMessages = new[] { "User with this email already exists" }
                 };
@@ -137,7 +137,7 @@ namespace Synk.Services
 
             if (!createdUser.Succeeded)
             {
-                return new AuthenticationResult
+                return new AuthenticationResultDto
                 {
                     ErrorMessages = createdUser.Errors.Select(x => x.Description)
                 };
@@ -146,7 +146,7 @@ namespace Synk.Services
             return await GenerateAuthenticationResultForUserAsync(newUser);
         }
 
-        private async Task<AuthenticationResult> GenerateAuthenticationResultForUserAsync(IdentityUser user)
+        private async Task<AuthenticationResultDto> GenerateAuthenticationResultForUserAsync(IdentityUser user)
         {
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_jwtSettings.Secret);
@@ -175,7 +175,7 @@ namespace Synk.Services
             await _dataContext.RefreshTokens.AddAsync(refreshToken);
             await _dataContext.SaveChangesAsync();
 
-            return new AuthenticationResult
+            return new AuthenticationResultDto
             {
                 Success = true,
                 RefreshToken = refreshToken.Token,

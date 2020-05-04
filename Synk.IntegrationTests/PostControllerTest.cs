@@ -35,12 +35,12 @@ namespace Synk.IntegrationTests
             var createdPost = await CreatePostAsync(new Contracts.v1.Requests.CreatePostRequest { Body = "Test post" });
 
             // Act
-            var respose = await TestClient.GetAsync(ApiRoutes.Posts.Get.Replace("{postId}", createdPost.Id.ToString()));
+            var respose = await TestClient.GetAsync(ApiRoutes.Posts.Get.Replace("{postId}", createdPost.Post.Id.ToString()));
 
             // Assert
             respose.StatusCode.Should().Be(HttpStatusCode.OK);
             var returnedPost = await respose.Content.ReadAsAsync<Post>();
-            returnedPost.Id.Should().Be(createdPost.Id);
+            returnedPost.Id.Should().Be(createdPost.Post.Id);
             returnedPost.Body.Should().Be("Test post");
         }
     }

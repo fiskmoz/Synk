@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Synk.Contracts;
+using Synk.Contracts.v1;
 using Synk.Contracts.v1.Requests;
 using Synk.Contracts.v1.Responses;
 using Synk.Extensions;
@@ -24,14 +25,14 @@ namespace Synk.Controllers
             _postService = postService;
         }
 
-        [HttpGet(ApiRoutes.Posts.GetAll)]
-        public async Task<IActionResult> GetAll()
+        [HttpGet(ApiRoutes.Posts.GetAll, Name = EndpointNames.Posts.GetAll)]
+        public async Task<ActionResult<MultiplePostsResponse>> GetAll()
         {
-            return Ok(await _postService.GetPostsAsync());
+            return Ok(new MultiplePostsResponse { posts = await _postService.GetPostsAsync() });
         }
 
-        [HttpPut(ApiRoutes.Posts.Update)]
-        public async Task<IActionResult> Update([FromRoute]Guid postId, [FromBody] UpdatePostRequest request)
+        [HttpPut(ApiRoutes.Posts.Update, Name = EndpointNames.Posts.Update)]
+        public async Task<ActionResult<SinglePostResponse>> Update([FromRoute]Guid postId, [FromBody] UpdatePostRequest request)
         {
             var userOwnsPost = await _postService.UserOwnsPostAsync(postId, HttpContext.GetUserId());
             if (!userOwnsPost)
@@ -43,11 +44,11 @@ namespace Synk.Controllers
 
             var updated = await _postService.UpdatePostAsync(post);
             if (updated)
-                return Ok(post);
+                return Ok(new SinglePostResponse { Post = post });
             return NotFound();
         }
 
-        [HttpDelete(ApiRoutes.Posts.Delete)]
+        [HttpDelete(ApiRoutes.Posts.Delete, Name = EndpointNames.Posts.Delete)]
         public async Task<IActionResult> Update([FromRoute]Guid postId)
         {
             var userOwnsPost = await _postService.UserOwnsPostAsync(postId, HttpContext.GetUserId());
@@ -61,17 +62,17 @@ namespace Synk.Controllers
             return NotFound();
         }
 
-        [HttpGet(ApiRoutes.Posts.Get)]
-        public async Task<IActionResult> Get([FromRoute]Guid postId)
+        [HttpGet(ApiRoutes.Posts.Get, Name = EndpointNames.Posts.Get)]
+        public async Task<ActionResult<SinglePostResponse>> Get([FromRoute]Guid postId)
         {
             var post = await _postService.GetPostByIdAsync(postId);
             if (post == null)
                 return NotFound();
-            return Ok(post);
+            return Ok(new SinglePostResponse { Post = post });
         }
 
-        [HttpPost(ApiRoutes.Posts.Create)]
-        public async Task<IActionResult> Create([FromBody] CreatePostRequest postRequest)
+        [HttpPost(ApiRoutes.Posts.Create, Name = EndpointNames.Posts.Create)]
+        public async Task<ActionResult<SinglePostResponse>> Create([FromBody] CreatePostRequest postRequest)
         {
             var post = new Post
             {
@@ -84,8 +85,8 @@ namespace Synk.Controllers
             var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.ToUriComponent()}";
             var locationUri = baseUrl + "/" + ApiRoutes.Posts.Get.Replace("{postId}", post.Id.ToString());
 
-            var response = new PostResponse { Id = post.Id };
-            return Created(locationUri, post);
+            var response = new SinglePostResponse { Post = post, locationUri = locationUri };
+            return Ok(response);
         }
     }
 }
