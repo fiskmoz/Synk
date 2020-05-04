@@ -1,0 +1,30 @@
+<!-- LOGIN WAITING -->
+<div *ngIf="userLoading">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-4 mx-auto">
+        <div class="app-init-card">
+          <span class="text-center">Authentication Loading</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN FAILED -->
+
+<div *ngIf="!userLoading && !authService.user">
+  <app-auth-page> </app-auth-page>
+</div>
+
+<!-- LOGIN SUCCESS -->
+
+<div class="app" *ngIf="authService.user">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </div>
+</div>
