@@ -8,9 +8,9 @@ namespace Synk.Services
 {
     public interface IIdentityService
     {
-        Task<AuthenticationResult> RegisterAsync(string email, string password);
+        Task<AuthenticationResultDto> RegisterAsync(string email, string password);
 
-        Task<AuthenticationResult> LoginAsync(string email, string password);
-        Task<AuthenticationResult> RefreshTokenAsync(string email, string password);
+        Task<AuthenticationResultDto> LoginAsync(string email, string password);
+        Task<AuthenticationResultDto> RefreshTokenAsync(string email, string password);
     }
 }

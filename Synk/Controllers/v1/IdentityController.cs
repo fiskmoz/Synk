@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using Synk.Contracts;
+using Synk.Contracts.v1;
 using Synk.Contracts.v1.Requests;
 using Synk.Contracts.v1.Responses;
 using Synk.Domain;
@@ -19,8 +21,9 @@ namespace Synk.Controllers.v1
             _identityService = identityService;
         }
 
-        [HttpPost(ApiRoutes.Identity.Register)]
-        public async Task<IActionResult> Register([FromBody] UserRegistrationRequest request)
+        [EnableCors("localhost")]
+        [HttpPost(ApiRoutes.Identity.Register, Name = EndpointNames.Identity.Register)]
+        public async Task<ActionResult<AuthSuccessResponse>> Register([FromBody] UserRegistrationRequest request)
         {
             if(!ModelState.IsValid)
             {
@@ -33,20 +36,23 @@ namespace Synk.Controllers.v1
             return ValidateAuthResponse(authResponse);
         }
 
-        [HttpPost(ApiRoutes.Identity.Login)]
-        public async Task<IActionResult> Login([FromBody] UserLoginRequest request)
+        [EnableCors("localhost")]
+        [HttpPost(ApiRoutes.Identity.Login, Name = EndpointNames.Identity.Login)]
+        public async Task<ActionResult<AuthSuccessResponse>> Login([FromBody] UserLoginRequest request)
         {
             var authResponse = await _identityService.LoginAsync(request.Email, request.Password);
             return ValidateAuthResponse(authResponse);
         }
-        [HttpPost(ApiRoutes.Identity.Refresh)]
-        public async Task<IActionResult> Login([FromBody] RefreshTokenRequest request)
+
+        [EnableCors("localhost")]
+        [HttpPost(ApiRoutes.Identity.Refresh, Name = EndpointNames.Identity.Refresh)]
+        public async Task<ActionResult<AuthSuccessResponse>> Login([FromBody] RefreshTokenRequest request)
         {
             var authResponse = await _identityService.RefreshTokenAsync(request.Token, request.RefreshToken);
             return ValidateAuthResponse(authResponse);
         }
 
-        private IActionResult ValidateAuthResponse(AuthenticationResult authResponse)
+        private ActionResult<AuthSuccessResponse> ValidateAuthResponse(AuthenticationResultDto authResponse)
         {
             if (!authResponse.Success)
             {

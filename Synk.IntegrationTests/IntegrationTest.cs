@@ -45,10 +45,10 @@ namespace Synk.IntegrationTests
             TestClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("bearer", await GetJwtAsync());
         }
 
-        protected async Task<PostResponse> CreatePostAsync(CreatePostRequest request)
+        protected async Task<SinglePostResponse> CreatePostAsync(CreatePostRequest request)
         {
             var response = await TestClient.PostAsJsonAsync(ApiRoutes.Posts.Create, request);
-            return await response.Content.ReadAsAsync<PostResponse>();
+            return await response.Content.ReadAsAsync<SinglePostResponse>();
         }
 
         private async Task<string> GetJwtAsync()

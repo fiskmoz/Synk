@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Synk.Domain
 {
-    public class AuthenticationResult
+    public class AuthenticationResultDto
     {
         public string Token { get; set; }
         public bool Success { get; set; }
